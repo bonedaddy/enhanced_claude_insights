@@ -1,6 +1,8 @@
-# Claude Code Insights Generator
+# Enhanced Claude Insights
 
-A self-hosted tool that generates detailed insights reports from your Claude Code usage data, similar to the official Claude Code insights but with full customization and local LLM processing.
+Enhanced Claude Insights is basically the `/insights` command from the claude code TUI, except it can be used to generate insights across all your usage data as opposed to a small subset of your usage data that `/insights` uses.
+
+It uses a combination of statistical analysis for generating charts and metrics from your usage data, and LLM analysis to generate detailed insights + actionable steps you can take to improve your claude code usage.
 
 ## Features
 
@@ -11,6 +13,8 @@ A self-hosted tool that generates detailed insights reports from your Claude Cod
 - Future Workflows - Ambitious autonomous workflow suggestions
 
 ## Prerequisites
+
+This should work with any OpenAI compatible API, but I tested against llamma.cpp
 
 ### 1. llama.cpp Server
 
@@ -33,7 +37,7 @@ No external dependencies required - uses only standard library.
 
 ### 3. Usage Data
 
-Your usage data should be in `$HOME/.claude/usage-data` and is what claude uses to generate the report from the `/insights` command, however it is only limited to around 3->5 sessions. This tool allows analyzing all available sessions for deeper insights.
+Your usage data should be in `$HOME/.claude/usage-data` or where ever you ahve setup claude code to store that stuff.
 
 Usage data analyzed:
 
@@ -224,9 +228,35 @@ LLM used:
 Hardware: 
 
  - GPU: RTX 5090
- - CPU: 9950X3d
+ - CPU: 9950 X3D
 
-To analyze 980 sessions and 280 faucets took ~109 seconds
+To analyze 980 sessions and 280 faucets took ~109 seconds.
+
+Startup script for the llama.cpp serve I used
+
+```bash
+$> /home/foobar/llama.cpp/build/bin/llama-server \
+      -m /home/foobar/models/Qwen3.5-27B.Q4_K_M.gguf \
+      --alias Qwen3.5-27B \
+      --host 0.0.0.0 --port 8001 \
+      --temp 0.6 \
+      --top-p 0.95 \
+      --top-k 20 \
+      --min-p 0.00 \
+      --jinja \
+      --ctx-size 262144 \
+      --n-gpu-layers all \
+      --parallel 2 \
+      --threads 8 --threads-batch 12 \
+      --flash-attn on \
+      --batch-size 2048 --ubatch-size 512 \
+      --prio 3 --no-warmup \
+      --swa-full \
+      --no-mmap \
+      --mlock \
+      --cache-type-k q8_0 \
+      --cache-type-v q8_0
+```
 
 ## License
 
